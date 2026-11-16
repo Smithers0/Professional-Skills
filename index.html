@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strath Unfiltered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: navy header, blue page banner, alternating white and light-blue bands, 1100px column */
+  /* One hue family: navy to pale blue. Neutrals lean toward the navy. No second accent. */
+  --navy:#14213D; --blue:#2F5D9E; --pale:#C7D7EE; --band:#E6ECF5; --panel:#F2F5FA; --paper:#FFFFFF;
+  --ink:#172033; --muted:#55617A; --line:#CBD5E4; --mapbg:#E9EEF5; --park:#D5E2DD;
+  --display:'Lato',Arial,sans-serif; --body:'Roboto',Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+h1,h2,h3{font-family:var(--display);color:var(--navy);margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:clamp(30px,5vw,44px);font-weight:900}
+h2{font-size:26px} h3{font-size:19px}
+p{margin:0;max-width:68ch}
+a{color:var(--blue)} a:hover{color:var(--navy)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+header.site :focus-visible,footer :focus-visible{outline-color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.stack{display:flex;flex-direction:column;gap:18px}
+
+header.site{background:var(--navy);color:#fff}
+header.site .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 28px;padding-top:14px;padding-bottom:14px}
+.brand{font-family:var(--display);font-weight:900;font-size:21px;color:#fff;text-decoration:none}
+nav.main{display:flex;flex-wrap:wrap;gap:4px 6px}
+nav.main a{color:#fff;text-decoration:none;font-size:15px;padding:8px 10px;border-radius:4px}
+nav.main a:hover{background:rgba(255,255,255,.14);color:#fff}
+nav.main a[aria-current="page"]{background:#fff;color:var(--navy);font-weight:500}
+
+.page{display:none} .page.on{display:block}
+.banner{background:var(--blue);color:#fff;padding:44px 0}
+.banner h1,.banner p{color:#fff}
+.banner p{font-size:19px;margin-top:12px}
+section.band{padding:40px 0}
+section.tint{background:var(--band)}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;gap:6px;background:var(--paper);border:1px solid var(--line);padding:20px;text-decoration:none;color:var(--ink)}
+.tile:hover{border-color:var(--blue);color:var(--ink)}
+.tile strong{font-family:var(--display);font-size:19px;color:var(--navy)}
+.tile span{font-size:15px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:6px}
+.tint .card{background:var(--paper)}
+.card p{font-size:16px}
+.src{font-size:14px;color:var(--muted)}
+.todo{background:var(--band);color:var(--muted);padding:0 4px;border-bottom:1px dashed var(--blue)}
+ul.plain{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:16px}
+th{background:var(--navy);color:#fff;text-align:left;font-weight:500;padding:11px 14px}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(odd){background:var(--panel)}
+.btn{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;padding:11px 18px;font-weight:500;border:0;font:inherit;cursor:pointer}
+.btn:hover{background:var(--blue);color:#fff}
+
+/* Map */
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border:2px solid var(--line);background:var(--paper);font:inherit;font-size:15px;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--navy);background:var(--band)}
+.chip[aria-pressed="false"]{color:var(--muted);text-decoration:line-through}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid;font-size:12px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
+.maprow{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.mapframe{position:relative;flex:999 1 560px;min-width:0;border:1px solid var(--line);background:var(--mapbg);aspect-ratio:1000/620}
+.mapframe svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid #fff;color:#fff;font:500 12px var(--body);cursor:pointer;padding:0;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.pin::after{content:"";position:absolute;inset:-10px}
+.pin.sel{outline:3px solid var(--blue);outline-offset:2px;z-index:2}
+.detail{flex:1 1 260px;background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:8px;min-height:180px}
+.placelist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 20px;margin:0;padding:0;list-style:none}
+.placelist button{background:none;border:0;font:inherit;color:var(--blue);text-align:left;cursor:pointer;padding:6px 0;display:flex;gap:8px;align-items:center;text-decoration:underline}
+
+form.fb{display:flex;flex-direction:column;gap:12px;max-width:520px}
+form.fb label{font-weight:500}
+form.fb select,form.fb textarea{font:inherit;padding:10px;border:1px solid var(--muted);width:100%;background:#fff;color:var(--ink)}
+footer{background:var(--navy);color:#fff;padding:28px 0;font-size:15px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 28px}
+footer a{color:#fff}
+/* ---- Fluid interface layer: materials, type, press feedback, motion ---- */
+body{font-size:1.0625rem}
+h1{font-size:clamp(2rem,5vw,3rem);line-height:1.06;letter-spacing:-0.022em}
+h2{font-size:1.625rem;line-height:1.15;letter-spacing:-0.012em}
+h3{font-size:1.1875rem;letter-spacing:-0.005em}
+.banner p{font-size:1.1875rem;line-height:1.45}
+
+/* Translucent chrome: content scrolls under the header */
+header.site{position:sticky;top:0;z-index:10;background:rgba(20,33,61,.82);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 8px 24px -16px rgba(20,33,61,.6)}
+nav.main a{border-radius:999px;padding:8px 13px;font-weight:500;letter-spacing:.005em;
+  transition:background-color .2s ease,color .2s ease,transform .1s ease-out}
+.banner{padding:3.5rem 0}
+
+/* Navigation: five items, guides grouped in a menu anchored to its button */
+header.site .wrap{flex-wrap:wrap}
+nav.main{align-items:center;gap:4px}
+.dd{position:relative}
+.dd>button,.menu-btn{font:inherit;font-size:15px;font-weight:500;color:#fff;background:none;border:0;border-radius:999px;
+  padding:8px 13px;min-height:40px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:background-color .2s ease,transform .1s ease-out}
+.dd>button:hover,.menu-btn:hover{background:rgba(255,255,255,.14)}
+.dd>button:active,.menu-btn:active{transform:scale(.97)}
+.dd>button.cur{background:#fff;color:var(--navy)}
+.dd>button svg{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.dd.open>button svg{transform:rotate(180deg)}
+.dd-menu{display:none;position:absolute;top:calc(100% + 10px);left:0;min-width:240px;flex-direction:column;gap:2px;padding:6px;
+  background:var(--navy);border-radius:16px;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 18px 40px -12px rgba(20,33,61,.55);
+  transform-origin:top left;animation:menu-in .22s cubic-bezier(.2,.8,.2,1) both}
+.dd.open .dd-menu{display:flex}
+nav.main .dd-menu a{border-radius:10px;padding:10px 12px}
+@keyframes menu-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.menu-btn{display:none}
+@media (max-width:760px){
+  .menu-btn{display:inline-flex}
+  nav.main{display:none;width:100%;flex-direction:column;align-items:stretch;gap:2px;padding-bottom:6px}
+  nav.main.open{display:flex;animation:fade .2s ease both}
+  .dd,.dd-menu{display:contents}
+  .dd>button{display:none}
+  nav.main a,nav.main .dd-menu a{border-radius:10px;padding:11px 12px}
+}
+@media (prefers-reduced-motion:reduce){.dd-menu{animation:fade .15s ease both}.dd>button svg{transition:none}}
+
+/* Surfaces: one radius scale, shadow only where a surface lifts */
+.tile,.card,.detail,.mapframe,.tablebox{border-radius:16px}
+.mapframe,.tablebox{overflow:hidden}
+.tablebox{overflow-x:auto;border:1px solid var(--line)}
+td{border-bottom-color:var(--line)} tbody tr:last-child td{border-bottom:0}
+.tile{border-color:transparent;box-shadow:0 0 0 1px var(--line),0 1px 2px rgba(20,33,61,.06);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s cubic-bezier(.2,.8,.2,1)}
+.tile:hover{border-color:transparent;transform:translateY(-2px);box-shadow:0 0 0 1px var(--blue),0 10px 24px -12px rgba(20,33,61,.35)}
+.btn{border-radius:999px;padding:.7rem 1.3rem;transition:background-color .2s ease,transform .1s ease-out}
+.chip{border-radius:999px;transition:background-color .2s ease,border-color .2s ease,color .2s ease,transform .1s ease-out}
+form.fb select,form.fb textarea{border-radius:10px}
+
+/* Response: feedback on press, instantly */
+.btn:active,.chip:active,.tile:active,nav.main a:active,.placelist button:active{transform:scale(.97);transition-duration:.1s}
+.brand:active{opacity:.7}
+
+/* Map pins: arrive from their own point, grow when selected */
+.pin{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease;animation:pin-in .28s cubic-bezier(.2,.8,.2,1) both}
+.pin:hover{transform:translate(-50%,-50%) scale(1.12)}
+.pin:active{transform:translate(-50%,-50%) scale(.92);transition-duration:.1s}
+.pin.sel{transform:translate(-50%,-50%) scale(1.3);box-shadow:0 4px 12px rgba(0,0,0,.35)}
+@keyframes pin-in{from{opacity:0;transform:translate(-50%,-50%) scale(.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.detail.in>*{animation:rise .3s cubic-bezier(.2,.8,.2,1) both}
+.page.on{animation:rise .35s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.glinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.glinks .btn{font-size:.9375rem;padding:.6rem 1.1rem}
+.btn.ghost{background:transparent;color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
+.btn.ghost:hover{background:var(--band);color:var(--navy)}
+.gmap{width:100%;height:480px;border:0;border-radius:16px;display:block}
+/* Gentler equivalents, not no feedback */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .page.on,.detail.in>*,.pin{animation:fade .2s ease both}
+  .tile:hover,.pin:hover,.pin.sel,.pin:active{transform:translate(-50%,-50%)}
+  .tile:hover{transform:none}
+  .btn:active,.chip:active,.tile:active,nav.main a:active,.placelist button:active{transform:none;opacity:.75}
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-transparency:reduce){
+  header.site{background:var(--navy);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-contrast:more){
+  header.site{background:var(--navy);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .tile,.card,.detail,.chip{box-shadow:none;border:2px solid var(--navy)}
+}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="#home">Strath Unfiltered</a>
+  <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainnav">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Menu</button>
+  <nav class="main" id="mainnav" aria-label="Main">
+    <a href="#home">Home</a><a href="#map">Map</a>
+    <div class="dd" id="dd">
+      <button type="button" id="ddBtn" aria-expanded="false" aria-controls="ddMenu">Guides
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dd-menu" id="ddMenu">
+        <a href="#campus">Campus guide</a><a href="#food">Food and nights out</a><a href="#housing">Accommodation</a><a href="#union">Societies and Union</a><a href="#gym">Gym and library</a><a href="#money">Money</a>
+      </div>
+    </div>
+    <a href="#links">Useful links</a><a href="#about">About</a>
+  </nav>
+</div></header>
+
+<main>
+<!-- HOME -->
+<div class="page" id="p-home">
+  <div class="banner"><div class="wrap"><h1>Strath Unfiltered</h1><p>Honest advice for new Strathclyde students, from the students already here.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <h2>Start here</h2>
+    <div class="tiles">
+      <a class="tile" href="#campus"><strong>Campus guide</strong><span>Which building is which and where to study</span></a>
+      <a class="tile" href="#map"><strong>Map</strong><span>Buildings, study spots, gym and Union on one map</span></a>
+      <a class="tile" href="#food"><strong>Food and nights out</strong><span>Cheap lunches, coffee and bars</span></a>
+      <a class="tile" href="#housing"><strong>Accommodation</strong><span>Halls and flat areas, with pros and cons</span></a>
+      <a class="tile" href="#union"><strong>Societies and Union</strong><span>How to join and what it costs</span></a>
+      <a class="tile" href="#gym"><strong>Gym and library</strong><span>Opening hours and quiet times</span></a>
+      <a class="tile" href="#money"><strong>Money</strong><span>Discounts, travel and weekly costs</span></a>
+      <a class="tile" href="#links"><strong>Useful links</strong><span>The official pages you will need</span></a>
+    </div>
+  </div></section>
+  <section class="band tint"><div class="wrap stack">
+    <h2>What nobody tells you</h2>
+    <p>Picked from our survey of current students.</p>
+    <div class="cards">
+      <div class="card"><h3>Study in the morning</h3><p>Mornings came up as the best time to get a seat in the library.</p><span class="src">Source: student survey</span></div>
+      <div class="card"><h3>Dennistoun for flats</h3><p>It was the area students mentioned most for renting after first year.</p><span class="src">Source: student survey</span></div>
+      <div class="card"><h3>Join a club early</h3><p>Rowing, mountaineering and USM were named as standout clubs.</p><span class="src">Source: student survey</span></div>
+    </div>
+  </div></section>
+</div>
+
+<!-- CAMPUS -->
+<div class="page" id="p-campus">
+  <div class="banner"><div class="wrap"><h1>Campus guide</h1><p>Which building is which, what is taught where, and the best places to study.</p></div></div>
+  <section class="band tint"><div class="wrap stack">
+    <h2>Quick answers</h2>
+    <ul class="plain">
+      <li><span class="todo">[Chris: the building most new students get lost finding]</span></li>
+      <li><span class="todo">[Chris: a way to cut between buildings indoors]</span></li>
+      <li>Livingstone Tower and the library came up most often as places to study.</li>
+    </ul>
+    <p>Room codes on your timetable start with a building code, for example LT for Livingstone Tower. The university lists them all on its <a href="https://www.strath.ac.uk/professionalservices/estates/roombooking/buildingcodes/">building codes page</a>.</p>
+  </div></section>
+  <section class="band"><div class="wrap stack">
+    <h2>Main buildings</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Building</th><th>Code</th><th>What is in it</th><th>Find it</th></tr></thead>
+      <tbody id="bldgRows"></tbody>
+    </table></div>
+  </div></section>
+  <section class="band tint"><div class="wrap stack">
+    <h2>Best places to study</h2>
+    <p>Picked from what current students suggested.</p>
+    <div class="cards">
+      <div class="card"><h3>Library</h3><p>All floors except floor 2.</p></div>
+      <div class="card"><h3>Livingstone Tower</h3><p>Often free rooms, on all floors.</p></div>
+      <div class="card"><h3>Stenhouse Wing</h3><p>Floor 4 has a large computer room.</p></div>
+      <div class="card"><h3>James Weir</h3><p>The computer rooms on floor 4 are often free.</p></div>
+      <div class="card"><h3>Learning and Teaching</h3><p>A good place to meet groups and talk.</p></div>
+    </div>
+  </div></section>
+</div>
+
+<!-- MAP -->
+<div class="page" id="p-map">
+  <div class="banner"><div class="wrap"><h1>Map</h1><p>Tap a pin for details, then open the place in Google Maps or get walking directions.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <div id="gmapslot" hidden></div>
+    <div><a class="btn" href="https://www.google.com/maps/search/?api=1&query=University+of+Strathclyde+John+Anderson+Campus+Glasgow">Open the campus in Google Maps</a></div>
+    <div class="filters" id="filters" role="group" aria-label="Show on map"></div>
+    <div class="maprow">
+      <div class="mapframe" id="mapframe">
+        <svg viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="300" y="290" width="150" height="90" fill="#D5E2DD"/>
+          <g stroke="#fff" stroke-width="16" stroke-linecap="round">
+            <line x1="0" y1="140" x2="1000" y2="125"/><line x1="0" y1="505" x2="1000" y2="500"/>
+            <line x1="275" y1="280" x2="830" y2="285"/><line x1="275" y1="400" x2="560" y2="400"/>
+            <line x1="275" y1="130" x2="275" y2="620"/><line x1="142" y1="140" x2="142" y2="620"/>
+            <line x1="475" y1="130" x2="475" y2="505"/><line x1="833" y1="0" x2="833" y2="620"/>
+            <line x1="420" y1="60" x2="800" y2="50"/>
+          </g>
+          <g font-family="Roboto,Arial,sans-serif" font-size="15" fill="#55617A">
+            <text x="20" y="128">Cathedral Street</text><text x="20" y="530">George Street</text>
+            <text x="600" y="272">Rottenrow</text><text x="490" y="424">Richmond Street</text>
+            <text x="560" y="42">St James Road</text><text x="848" y="600">High Street</text>
+            <text x="286" y="600">Montrose St</text><text x="34" y="600">John St</text>
+            <text x="318" y="340" fill="#3E5A52">Rottenrow Gardens</text>
+          </g>
+        </svg>
+      </div>
+      <div class="detail" id="detail" aria-live="polite"></div>
+    </div>
+    <p class="src">This is a simplified drawing with approximate pin positions, not a street map. Check the university's own campus map before relying on it.</p>
+    <h2>All places</h2>
+    <ul class="placelist" id="placelist"></ul>
+  </div></section>
+</div>
+
+<!-- FOOD -->
+<div class="page" id="p-food">
+  <div class="banner"><div class="wrap"><h1>Food and nights out</h1><p>Where students actually eat, get coffee and go for a drink near campus.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <h2>Survey favourites</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Place</th><th>Good for</th><th>Price level</th><th>What students said</th></tr></thead>
+      <tbody>
+        <tr><td>Roasters</td><td>Coffee</td><td><span class="todo">[Ethan]</span></td><td>Most mentioned for coffee</td></tr>
+        <tr><td>Greggs</td><td>Lunch</td><td><span class="todo">[Ethan]</span></td><td>The go-to cheap lunch</td></tr>
+        <tr><td>The Ark</td><td>Drinks</td><td><span class="todo">[Ethan]</span></td><td>Mentioned for drinks</td></tr>
+        <tr><td>The Howgait</td><td>Drinks</td><td><span class="todo">[Ethan]</span></td><td>Mentioned for drinks</td></tr>
+      </tbody>
+    </table></div>
+    <p class="src">Source: student survey. Addresses and map pins still to add.</p>
+  </div></section>
+</div>
+
+<!-- HOUSING -->
+<div class="page" id="p-housing">
+  <div class="banner"><div class="wrap"><h1>Accommodation</h1><p>Halls for first year and the areas students move to afterwards.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <h2>Halls students mentioned</h2>
+    <div class="cards">
+      <div class="card"><h3>Birkbeck Court</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><h3>James Young</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><h3>Chancellors Hall</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+    </div>
+  </div></section>
+  <section class="band tint"><div class="wrap stack">
+    <h2>Areas for flats</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Area</th><th>Rough rent</th><th>Walk to campus</th><th>Pros</th><th>Cons</th></tr></thead>
+      <tbody>
+        <tr><td>Dennistoun</td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td>Most common choice in our survey</td><td><span class="todo">[add]</span></td></tr>
+        <tr><td>Merchant City</td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td></tr>
+        <tr><td>Garnethill</td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td></tr>
+        <tr><td>West End</td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td><td><span class="todo">[add]</span></td></tr>
+      </tbody>
+    </table></div>
+    <h2>Before you sign</h2>
+    <p><span class="todo">[Chris: when to start looking and what to check before signing a lease]</span></p>
+  </div></section>
+</div>
+
+<!-- UNION -->
+<div class="page" id="p-union">
+  <div class="banner"><div class="wrap"><h1>Societies and Strath Union</h1><p>How to join a club or society, and which memberships you need.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <h2>How to join</h2>
+    <ol class="plain">
+      <li><span class="todo">[Chris: step 1]</span></li>
+      <li><span class="todo">[Chris: step 2]</span></li>
+      <li><span class="todo">[Chris: step 3]</span></li>
+    </ol>
+    <h2>Which memberships you need</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Membership</th><th>Who needs it</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td>Society membership</td><td><span class="todo">[add]</span></td><td><span class="todo">[check official page]</span></td></tr>
+        <tr><td>Sports Union</td><td><span class="todo">[add]</span></td><td><span class="todo">[check official page]</span></td></tr>
+        <tr><td>Gym</td><td><span class="todo">[add]</span></td><td><span class="todo">[check official page]</span></td></tr>
+      </tbody>
+    </table></div>
+  </div></section>
+  <section class="band tint"><div class="wrap stack">
+    <h2>Clubs students rated</h2>
+    <div class="cards">
+      <div class="card"><h3>USM</h3><p><span class="todo">[why students like it]</span></p></div>
+      <div class="card"><h3>Rowing</h3><p><span class="todo">[why students like it]</span></p></div>
+      <div class="card"><h3>Mountaineering</h3><p><span class="todo">[why students like it]</span></p></div>
+    </div>
+    <p>Official pages: <a href="https://www.strathunion.com/">Strath Union</a> and <a href="https://www.strath.ac.uk/strathclydesport/">Strathclyde Sport</a>.</p>
+  </div></section>
+</div>
+
+<!-- GYM -->
+<div class="page" id="p-gym">
+  <div class="banner"><div class="wrap"><h1>Gym and library</h1><p>Opening hours from the official pages, and quiet times from students.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <div class="tablebox"><table>
+      <thead><tr><th>Place</th><th>Opening hours</th><th>Quietest</th><th>Busiest</th></tr></thead>
+      <tbody>
+        <tr><td>Library (Curran Building)</td><td><span class="todo">[from official page]</span></td><td>Mornings, per the survey</td><td><span class="todo">[add]</span></td></tr>
+        <tr><td>Strathclyde Sport gym</td><td><span class="todo">[from official page]</span></td><td><span class="todo">[from survey]</span></td><td><span class="todo">[add]</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="src">Hours change around exams and holidays. Always check the official page.</p>
+  </div></section>
+</div>
+
+<!-- MONEY -->
+<div class="page" id="p-money">
+  <div class="banner"><div class="wrap"><h1>Money</h1><p>Ways to spend less in Glasgow, and where to get help if money is tight.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <div class="cards">
+      <div class="card"><h3>Student discounts</h3><p>UNiDAYS, Totum and the Young Scot card. <span class="todo">[Paúl: what each is best for]</span></p></div>
+      <div class="card"><h3>Travel</h3><p>Under-22s living in Scotland can apply for free bus travel. <span class="todo">[Paúl: railcards and subway]</span></p></div>
+      <div class="card"><h3>Weekly costs</h3><p><span class="todo">[Paúl: rough weekly budget]</span></p></div>
+      <div class="card"><h3>Cheap food shopping</h3><p><span class="todo">[Paúl: shops near campus]</span></p></div>
+      <div class="card"><h3>Part-time jobs</h3><p><span class="todo">[Paúl: where to look]</span></p></div>
+      <div class="card"><h3>If money is tight</h3><p><span class="todo">[Paúl: university support and funds, with official links]</span></p></div>
+    </div>
+  </div></section>
+</div>
+
+<!-- LINKS -->
+<div class="page" id="p-links">
+  <div class="banner"><div class="wrap"><h1>Useful links</h1><p>The official pages you will use most, and what each one is for.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <div class="tablebox"><table>
+      <thead><tr><th>Link</th><th>What it is for</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://classes.myplace.strath.ac.uk/">MyPlace</a></td><td>Class pages, lecture notes and coursework submission</td></tr>
+        <tr><td><a href="https://pegasus.strath.ac.uk/">Pegasus</a></td><td>Registration, results and your student record</td></tr>
+        <tr><td><a href="https://www.strath.ac.uk/professionalservices/estates/roombooking/buildingcodes/">Building codes</a></td><td>Work out which building a room code is in</td></tr>
+        <tr><td><a href="https://www.strathunion.com/">Strath Union</a></td><td>Societies, events and advice</td></tr>
+        <tr><td><a href="https://www.strath.ac.uk/strathclydesport/">Strathclyde Sport</a></td><td>Gym membership, classes and sports clubs</td></tr>
+        <tr><td><span class="todo">[Paúl: library, IT help, student support, timetables]</span></td><td></td></tr>
+      </tbody>
+    </table></div>
+  </div></section>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="p-about">
+  <div class="banner"><div class="wrap"><h1>About us</h1><p>Who made this site and how to tell us what is missing.</p></div></div>
+  <section class="band"><div class="wrap stack">
+    <p>Strath Unfiltered is a student project for the ME538 Professional Skills module, made by Ethan, Calum, Harrison, Paúl and Chris. The advice comes from a survey of current students.</p>
+    <p><strong>This is not official university advice.</strong> For anything important, check the official pages linked on each page.</p>
+  </div></section>
+  <section class="band tint"><div class="wrap stack">
+    <h2>Feedback</h2>
+    <form class="fb" id="fb">
+      <label for="fb-useful">Was the site useful?</label>
+      <select id="fb-useful"><option>Yes</option><option>A bit</option><option>No</option></select>
+      <label for="fb-missing">What is missing?</label>
+      <textarea id="fb-missing" rows="4"></textarea>
+      <div><button class="btn" type="submit">Send feedback</button></div>
+      <p id="fb-msg" role="status"></p>
+    </form>
+  </div></section>
+</div>
+</main>
+
+<footer><div class="wrap">
+  <span>Made by students. Not official university advice.</span>
+  <a href="#about">About and feedback</a>
+</div></footer>
+
+<script>
+// ---- Places. Positions are approximate (lat, lon) and should be checked before real use.
+var CATS={b:{name:'Campus buildings',c:'background:#14213D;color:#fff;border-color:#fff'},
+ s:{name:'Study spots',c:'background:#2F5D9E;color:#fff;border-color:#fff'},
+ g:{name:'Gym and library',c:'background:#fff;color:#14213D;border-color:#14213D'},
+ u:{name:'Union',c:'background:#C7D7EE;color:#14213D;border-color:#2F5D9E'}};
+var P=[
+ ['b','Royal College Building','RC',55.8611,-4.2462,'204 George Street. Assembly hall on level 4.'],
+ ['b','James Weir Building','JW',55.8622,-4.2459,''],
+ ['b','Thomas Graham Building','TG',55.8629,-4.2462,''],
+ ['b','Henry Dyer Building','HD',55.8618,-4.2449,''],
+ ['b','McCance Building','MC',55.8613,-4.2446,'16 Richmond Street.'],
+ ['b','Collins Building','CL',55.8610,-4.2444,''],
+ ['b','Livingstone Tower','LT',55.8610,-4.2436,'26 Richmond Street. Computer and Information Sciences, Mathematics and Statistics.'],
+ ['b','Graham Hills Building','GH',55.8606,-4.2422,'40-50 George Street.'],
+ ['b','John Anderson Building','JA',55.8616,-4.2416,''],
+ ['b','Learning and Teaching Building','TL',55.8619,-4.2437,''],
+ ['b','Sir William Duncan Wing','DW',55.8626,-4.2428,''],
+ ['b','Business School (Cathedral Street and Stenhouse Wings)','CW / SW',55.8630,-4.2437,'Strathclyde Business School.','Strathclyde Business School'],
+ ['b','Technology and Innovation Centre','TC',55.8604,-4.2436,''],
+ ['b','SIPBS (Robertson and Hamnett Wings)','AB / HW',55.8629,-4.2400,'','Strathclyde Institute of Pharmacy and Biomedical Sciences'],
+ ['b','Wolfson Centre','WC',55.8621,-4.2408,''],
+ ['b','Lord Todd Building','AQ',55.8625,-4.2390,''],
+ ['b','Lord Hope Building','LH',55.8637,-4.2426,'141 St James Road.'],
+ ['b','Barony Hall','BH',55.8617,-4.2375,'1 Macleod Street.'],
+ ['s','Library study floors','',55.8631,-4.2409,'All floors except floor 2.','Curran Building'],
+ ['s','Livingstone Tower rooms','',55.8612,-4.2431,'Often free rooms, on all floors.','Livingstone Tower'],
+ ['s','Stenhouse Wing computer room','',55.8632,-4.2432,'Floor 4 has a large computer room.','Strathclyde Business School'],
+ ['s','James Weir computer rooms','',55.8624,-4.2454,'Floor 4 rooms are often free.','James Weir Building'],
+ ['s','Learning and Teaching Building','',55.8621,-4.2432,'A good place to meet groups and talk.'],
+ ['g','Library (Curran Building)','CU',55.8633,-4.2414,'101 St James Road. Mornings are quietest, per the survey.','Andersonian Library Curran Building'],
+ ['g','Strathclyde Sport','SH',55.8636,-4.2444,'Gym and sports hall.'],
+ ['u','Strath Union','',55.8617,-4.2440,'In the Learning and Teaching Building. Check the Union site for the entrance.']
+].map(function(a,i){return{id:i,cat:a[0],name:a[1],code:a[2],lat:a[3],lon:a[4],note:a[5],q:(a[6]||a[1])+', University of Strathclyde, Glasgow'}});
+function gSearch(p){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.q)}
+function gWalk(p){return 'https://www.google.com/maps/dir/?api=1&travelmode=walking&destination='+encodeURIComponent(p.q)}
+// Paste your Google My Maps embed link here (the src from 'Embed on my site'). It shows once the site is hosted, for example on GitHub Pages.
+var MY_MAPS_EMBED='';
+
+var frame=document.getElementById('mapframe'),detail=document.getElementById('detail'),list=document.getElementById('placelist');
+var shown={b:true,s:true,g:true,u:true},sel=null;
+function xy(p){return[(p.lon+4.2485)/0.012*100,(55.8642-p.lat)/0.0042*100]}
+function letter(c){return{b:'B',s:'S',g:'G',u:'U'}[c]}
+function dot(c){return '<span class="dot" style="'+CATS[c].c+'">'+letter(c)+'</span>'}
+
+function showDetail(p){
+  sel=p?p.id:null;
+  frame.querySelectorAll('.pin').forEach(function(b){b.classList.toggle('sel',+b.dataset.id===sel)});
+  detail.innerHTML=p?'<h3>'+p.name+'</h3><span class="src">'+CATS[p.cat].name+(p.code?' · Code '+p.code:'')+'</span><p>'+(p.note||'Details to add.')+'</p><div class="glinks"><a class="btn" href="'+gSearch(p)+'">Open in Google Maps</a><a class="btn ghost" href="'+gWalk(p)+'">Walking directions</a></div>'
+    :'<h3>Pick a place</h3><p>Tap a pin or a name in the list to see what is there.</p>';
+  detail.classList.remove('in');void detail.offsetWidth;detail.classList.add('in');
+}
+function draw(){
+  frame.querySelectorAll('.pin').forEach(function(b){b.remove()});
+  list.innerHTML='';
+  P.forEach(function(p){
+    if(!shown[p.cat])return;
+    var c=xy(p),b=document.createElement('button');
+    b.className='pin'+(p.id===sel?' sel':'');b.dataset.id=p.id;b.type='button';
+    b.style.cssText='left:'+c[0]+'%;top:'+c[1]+'%;'+CATS[p.cat].c;
+    b.textContent=letter(p.cat);b.setAttribute('aria-label',p.name+', '+CATS[p.cat].name);
+    b.onclick=function(){showDetail(p)};frame.appendChild(b);
+    var li=document.createElement('li'),lb=document.createElement('button');
+    lb.type='button';lb.innerHTML=dot(p.cat)+p.name;lb.onclick=function(){showDetail(p);frame.scrollIntoView({block:'center'})};
+    li.appendChild(lb);list.appendChild(li);
+  });
+  if(sel!==null&&!shown[P[sel].cat])showDetail(null);
+}
+var filters=document.getElementById('filters');
+Object.keys(CATS).forEach(function(k){
+  var b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed','true');
+  b.innerHTML=dot(k)+CATS[k].name;
+  b.onclick=function(){shown[k]=!shown[k];b.setAttribute('aria-pressed',shown[k]);draw()};
+  filters.appendChild(b);
+});
+showDetail(null);draw();
+if(MY_MAPS_EMBED){var f=document.createElement('iframe');f.src=MY_MAPS_EMBED;f.title='Strath Unfiltered campus map on Google Maps';f.loading='lazy';f.className='gmap';
+  document.getElementById('gmapslot').appendChild(f);document.getElementById('gmapslot').hidden=false}
+
+// Building table on the campus page, built from the same data
+document.getElementById('bldgRows').innerHTML=P.filter(function(p){return p.cat==='b'||p.cat==='g'}).map(function(p){
+  return '<tr><td>'+p.name+'</td><td>'+p.code+'</td><td>'+(p.note||'<span class="todo">[Chris: add]</span>')+'</td><td><a href="#map" data-go="'+p.id+'">Show on map</a> · <a href="'+gSearch(p)+'">Google Maps</a></td></tr>'}).join('');
+var pending=null;
+document.addEventListener('click',function(e){var a=e.target.closest('[data-go]');if(a)pending=+a.dataset.go});
+
+// ---- Navigation menus
+var dd=document.getElementById('dd'),ddBtn=document.getElementById('ddBtn'),menuBtn=document.getElementById('menuBtn'),mainnav=document.getElementById('mainnav');
+function setDd(o){dd.classList.toggle('open',o);ddBtn.setAttribute('aria-expanded',o)}
+function setNav(o){mainnav.classList.toggle('open',o);menuBtn.setAttribute('aria-expanded',o)}
+function closeMenus(){setDd(false);setNav(false)}
+ddBtn.addEventListener('click',function(){setDd(!dd.classList.contains('open'))});
+menuBtn.addEventListener('click',function(){setNav(!mainnav.classList.contains('open'))});
+document.addEventListener('click',function(e){if(!dd.contains(e.target))setDd(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.classList.contains('open')){setDd(false);ddBtn.focus()}});
+
+// ---- Pages
+var PAGES=['home','campus','map','food','housing','union','gym','money','links','about'];
+function route(){
+  var h=location.hash.slice(1);if(PAGES.indexOf(h)<0)h='home';
+  PAGES.forEach(function(n){document.getElementById('p-'+n).classList.toggle('on',n===h)});
+  document.querySelectorAll('nav.main a').forEach(function(a){
+    if(a.getAttribute('href')==='#'+h)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  closeMenus();ddBtn.classList.toggle('cur',!!dd.querySelector('[aria-current]'));
+  if(h==='map'&&pending!==null){var p=P[pending];shown[p.cat]=true;draw();showDetail(p);pending=null}
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);route();
+
+document.getElementById('fb').addEventListener('submit',function(e){
+  e.preventDefault();
+  document.getElementById('fb-msg').textContent='Demo only: nothing was sent. On the real site this would be your Google Form.';
+});
+</script>
+</body>
+</html>
