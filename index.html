@@ -6,6 +6,7 @@
 <title>Strath Unfiltered</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
   /* Layout: navy header, blue page banner, alternating white and light-blue bands, 1100px column */
@@ -70,8 +71,7 @@ tbody tr:nth-child(odd){background:var(--panel)}
 .chip[aria-pressed="false"]{color:var(--muted);text-decoration:line-through}
 .dot{width:22px;height:22px;border-radius:50%;border:2px solid;font-size:12px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
 .maprow{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
-.mapframe{position:relative;flex:999 1 560px;min-width:0;border:1px solid var(--line);background:var(--mapbg);aspect-ratio:1000/620}
-.mapframe svg{position:absolute;inset:0;width:100%;height:100%}
+.mapframe{position:relative;flex:999 1 560px;min-width:0;border:1px solid var(--line);background:var(--mapbg);aspect-ratio:1000/620;min-height:420px}
 .pin{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid #fff;color:#fff;font:500 12px var(--body);cursor:pointer;padding:0;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .pin::after{content:"";position:absolute;inset:-10px}
 .pin.sel{outline:3px solid var(--blue);outline-offset:2px;z-index:2}
@@ -165,6 +165,13 @@ form.fb select,form.fb textarea{border-radius:10px}
 .hero:has(.hero-img){padding:5.5rem 0}
 .hero:has(.hero-img)::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(20,33,61,.5),rgba(20,33,61,.72))}
 .hero .wrap{position:relative;z-index:2}
+.lpin-wrap{background:none;border:0;display:flex;align-items:center;justify-content:center}
+.lpin{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;border:2px solid #fff;font:500 12px var(--body);
+  box-shadow:0 1px 3px rgba(0,0,0,.45);cursor:pointer;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease;animation:lpin-in .28s cubic-bezier(.2,.8,.2,1) both}
+.lpin-wrap:hover .lpin{transform:scale(1.12)}
+.lpin.sel{transform:scale(1.3);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--navy)}
+@keyframes lpin-in{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.lpin{animation:fade .2s ease both;transition:none}.lpin-wrap:hover .lpin,.lpin.sel{transform:none}}
 /* Gentler equivalents, not no feedback */
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -204,7 +211,7 @@ form.fb select,form.fb textarea{border-radius:10px}
 <main>
 <!-- HOME -->
 <div class="page" id="p-home">
-  <div class="banner hero"><img class="hero-img" src="images/home-banner.jpg" alt="" onerror="this.remove()"><div class="wrap"><h1>Strath Unfiltered</h1><p>Honest advice for new Strathclyde students, from the students already here.</p></div></div>
+  <div class="banner hero"><img class="hero-img" data-img="home-banner" alt=""><div class="wrap"><h1>Strath Unfiltered</h1><p>Honest advice for new Strathclyde students, from the students already here.</p></div></div>
   <section class="band"><div class="wrap stack">
     <h2>Start here</h2>
     <div class="tiles">
@@ -252,11 +259,11 @@ form.fb select,form.fb textarea{border-radius:10px}
     <h2>Best places to study</h2>
     <p>Picked from what current students suggested.</p>
     <div class="cards">
-      <div class="card"><img class="ph" src="images/library.jpg" alt="The university library" loading="lazy" onerror="this.remove()"><h3>Library</h3><p>All floors except floor 2.</p></div>
-      <div class="card"><img class="ph" src="images/livingstone-tower.jpg" alt="Livingstone Tower" loading="lazy" onerror="this.remove()"><h3>Livingstone Tower</h3><p>Often free rooms, on all floors.</p></div>
-      <div class="card"><img class="ph" src="images/stenhouse-wing.jpg" alt="Stenhouse Wing of the Business School" loading="lazy" onerror="this.remove()"><h3>Stenhouse Wing</h3><p>Floor 4 has a large computer room.</p></div>
-      <div class="card"><img class="ph" src="images/james-weir.jpg" alt="James Weir Building" loading="lazy" onerror="this.remove()"><h3>James Weir</h3><p>The computer rooms on floor 4 are often free.</p></div>
-      <div class="card"><img class="ph" src="images/learning-and-teaching.jpg" alt="Learning and Teaching Building" loading="lazy" onerror="this.remove()"><h3>Learning and Teaching</h3><p>A good place to meet groups and talk.</p></div>
+      <div class="card"><img class="ph" data-img="library" alt="The university library" loading="lazy"><h3>Library</h3><p>All floors except floor 2.</p></div>
+      <div class="card"><img class="ph" data-img="livingstone-tower" alt="Livingstone Tower" loading="lazy"><h3>Livingstone Tower</h3><p>Often free rooms, on all floors.</p></div>
+      <div class="card"><img class="ph" data-img="stenhouse-wing" alt="Stenhouse Wing of the Business School" loading="lazy"><h3>Stenhouse Wing</h3><p>Floor 4 has a large computer room.</p></div>
+      <div class="card"><img class="ph" data-img="james-weir" alt="James Weir Building" loading="lazy"><h3>James Weir</h3><p>The computer rooms on floor 4 are often free.</p></div>
+      <div class="card"><img class="ph" data-img="learning-and-teaching" alt="Learning and Teaching Building" loading="lazy"><h3>Learning and Teaching</h3><p>A good place to meet groups and talk.</p></div>
     </div>
   </div></section>
 </div>
@@ -269,28 +276,11 @@ form.fb select,form.fb textarea{border-radius:10px}
     <div><a class="btn" href="https://www.google.com/maps/search/?api=1&query=University+of+Strathclyde+John+Anderson+Campus+Glasgow">Open the campus in Google Maps</a></div>
     <div class="filters" id="filters" role="group" aria-label="Show on map"></div>
     <div class="maprow">
-      <div class="mapframe" id="mapframe">
-        <svg viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
-          <rect x="300" y="290" width="150" height="90" fill="#D5E2DD"/>
-          <g stroke="#fff" stroke-width="16" stroke-linecap="round">
-            <line x1="0" y1="140" x2="1000" y2="125"/><line x1="0" y1="505" x2="1000" y2="500"/>
-            <line x1="275" y1="280" x2="830" y2="285"/><line x1="275" y1="400" x2="560" y2="400"/>
-            <line x1="275" y1="130" x2="275" y2="620"/><line x1="142" y1="140" x2="142" y2="620"/>
-            <line x1="475" y1="130" x2="475" y2="505"/><line x1="833" y1="0" x2="833" y2="620"/>
-            <line x1="420" y1="60" x2="800" y2="50"/>
-          </g>
-          <g font-family="Roboto,Arial,sans-serif" font-size="15" fill="#55617A">
-            <text x="20" y="128">Cathedral Street</text><text x="20" y="530">George Street</text>
-            <text x="600" y="272">Rottenrow</text><text x="490" y="424">Richmond Street</text>
-            <text x="560" y="42">St James Road</text><text x="848" y="600">High Street</text>
-            <text x="286" y="600">Montrose St</text><text x="34" y="600">John St</text>
-            <text x="318" y="340" fill="#3E5A52">Rottenrow Gardens</text>
-          </g>
-        </svg>
-      </div>
+      <div class="mapframe" id="mapframe" role="region" aria-label="Campus map"></div>
       <div class="detail" id="detail" aria-live="polite"></div>
     </div>
-    <p class="src">This is a simplified drawing with approximate pin positions, not a street map. Check the university's own campus map before relying on it.</p>
+    <p class="src">Pin positions are approximate. Use the Google Maps buttons for exact directions.</p>
+    <div id="editbox" style="display:none"><h2>Fix pin positions</h2><p>Drag each pin onto the right building, then copy this list and send it to Claude.</p><textarea id="editout" rows="12" readonly style="width:100%;font:14px monospace;margin-top:10px"></textarea></div>
     <h2>All places</h2>
     <ul class="placelist" id="placelist"></ul>
   </div></section>
@@ -302,10 +292,10 @@ form.fb select,form.fb textarea{border-radius:10px}
   <section class="band"><div class="wrap stack">
     <h2>Survey favourites</h2>
     <div class="cards">
-      <div class="card"><img class="ph" src="images/roasters.jpg" alt="Roasters coffee shop" loading="lazy" onerror="this.remove()"><h3>Roasters</h3><span class="src">Coffee · Price: <span class="todo">[Ethan]</span></span><p>Most mentioned for coffee.</p></div>
-      <div class="card"><img class="ph" src="images/greggs.jpg" alt="Greggs near campus" loading="lazy" onerror="this.remove()"><h3>Greggs</h3><span class="src">Lunch · Price: <span class="todo">[Ethan]</span></span><p>The go-to cheap lunch.</p></div>
-      <div class="card"><img class="ph" src="images/the-ark.jpg" alt="The Ark bar" loading="lazy" onerror="this.remove()"><h3>The Ark</h3><span class="src">Drinks · Price: <span class="todo">[Ethan]</span></span><p>Mentioned for drinks.</p></div>
-      <div class="card"><img class="ph" src="images/the-howgait.jpg" alt="The Howgait bar" loading="lazy" onerror="this.remove()"><h3>The Howgait</h3><span class="src">Drinks · Price: <span class="todo">[Ethan]</span></span><p>Mentioned for drinks.</p></div>
+      <div class="card"><img class="ph" data-img="roasters" alt="Roasters coffee shop" loading="lazy"><h3>Roasters</h3><span class="src">Coffee · Price: <span class="todo">[Ethan]</span></span><p>Most mentioned for coffee.</p></div>
+      <div class="card"><img class="ph" data-img="greggs" alt="Greggs near campus" loading="lazy"><h3>Greggs</h3><span class="src">Lunch · Price: <span class="todo">[Ethan]</span></span><p>The go-to cheap lunch.</p></div>
+      <div class="card"><img class="ph" data-img="the-ark" alt="The Ark bar" loading="lazy"><h3>The Ark</h3><span class="src">Drinks · Price: <span class="todo">[Ethan]</span></span><p>Mentioned for drinks.</p></div>
+      <div class="card"><img class="ph" data-img="the-howgait" alt="The Howgait bar" loading="lazy"><h3>The Howgait</h3><span class="src">Drinks · Price: <span class="todo">[Ethan]</span></span><p>Mentioned for drinks.</p></div>
     </div>
     <p class="src">Source: student survey. Addresses and map pins still to add.</p>
   </div></section>
@@ -317,9 +307,9 @@ form.fb select,form.fb textarea{border-radius:10px}
   <section class="band"><div class="wrap stack">
     <h2>Halls students mentioned</h2>
     <div class="cards">
-      <div class="card"><img class="ph" src="images/birkbeck-court.jpg" alt="Birkbeck Court halls" loading="lazy" onerror="this.remove()"><h3>Birkbeck Court</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
-      <div class="card"><img class="ph" src="images/james-young.jpg" alt="James Young halls" loading="lazy" onerror="this.remove()"><h3>James Young</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
-      <div class="card"><img class="ph" src="images/chancellors-hall.jpg" alt="Chancellors Hall halls" loading="lazy" onerror="this.remove()"><h3>Chancellors Hall</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><img class="ph" data-img="birkbeck-court" alt="Birkbeck Court halls" loading="lazy"><h3>Birkbeck Court</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><img class="ph" data-img="james-young" alt="James Young halls" loading="lazy"><h3>James Young</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><img class="ph" data-img="chancellors-hall" alt="Chancellors Hall halls" loading="lazy"><h3>Chancellors Hall</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
     </div>
   </div></section>
   <section class="band tint"><div class="wrap stack">
@@ -443,6 +433,7 @@ form.fb select,form.fb textarea{border-radius:10px}
   <a href="#about">About and feedback</a>
 </div></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 // ---- Places. Positions are approximate (lat, lon) and should be checked before real use.
 var CATS={b:{name:'Campus buildings',c:'background:#14213D;color:#fff;border-color:#fff'},
@@ -482,34 +473,54 @@ function gWalk(p){return 'https://www.google.com/maps/dir/?api=1&travelmode=walk
 // Paste your Google My Maps embed link here (the src from 'Embed on my site'). It shows once the site is hosted, for example on GitHub Pages.
 var MY_MAPS_EMBED='';
 
-var frame=document.getElementById('mapframe'),detail=document.getElementById('detail'),list=document.getElementById('placelist');
-var shown={b:true,s:true,g:true,u:true},sel=null;
-function xy(p){return[(p.lon+4.2485)/0.012*100,(55.8642-p.lat)/0.0042*100]}
+var detail=document.getElementById('detail'),list=document.getElementById('placelist'),frame=document.getElementById('mapframe');
+var shown={b:true,s:true,g:true,u:true},sel=null,map=null,markers={};
+var EDIT=/[?&]edit/.test(location.search);
+var calm=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 function letter(c){return{b:'B',s:'S',g:'G',u:'U'}[c]}
 function dot(c){return '<span class="dot" style="'+CATS[c].c+'">'+letter(c)+'</span>'}
 
-function showDetail(p){
+function mark(){P.forEach(function(p){var m=markers[p.id];if(!m)return;var el=m.getElement();
+  if(el&&el.firstChild)el.firstChild.classList.toggle('sel',p.id===sel);m.setZIndexOffset(p.id===sel?1000:0)})}
+function showDetail(p,pan){
   sel=p?p.id:null;
-  frame.querySelectorAll('.pin').forEach(function(b){b.classList.toggle('sel',+b.dataset.id===sel)});
   detail.innerHTML=p?'<h3>'+p.name+'</h3><span class="src">'+CATS[p.cat].name+(p.code?' · Code '+p.code:'')+'</span><p>'+(p.note||'Details to add.')+'</p><div class="glinks"><a class="btn" href="'+gSearch(p)+'">Open in Google Maps</a><a class="btn ghost" href="'+gWalk(p)+'">Walking directions</a></div>'
     :'<h3>Pick a place</h3><p>Tap a pin or a name in the list to see what is there.</p>';
   detail.classList.remove('in');void detail.offsetWidth;detail.classList.add('in');
+  mark();
+  if(p&&pan&&map)map.setView([p.lat,p.lon],Math.max(map.getZoom(),17),{animate:!calm});
+}
+function editOut(){document.getElementById('editout').value=P.map(function(p){return p.name+' | '+p.lat+' | '+p.lon}).join('\n')}
+function makeMarker(p){
+  var m=L.marker([p.lat,p.lon],{title:p.name,keyboard:true,draggable:EDIT,
+    icon:L.divIcon({className:'lpin-wrap',html:'<span class="lpin" style="'+CATS[p.cat].c+'">'+letter(p.cat)+'</span>',iconSize:[40,40],iconAnchor:[20,20]})});
+  m.on('click',function(){showDetail(p)});
+  if(EDIT)m.on('dragend',function(){var ll=m.getLatLng();p.lat=+ll.lat.toFixed(5);p.lon=+ll.lng.toFixed(5);editOut()});
+  markers[p.id]=m;return m;
 }
 function draw(){
-  frame.querySelectorAll('.pin').forEach(function(b){b.remove()});
   list.innerHTML='';
   P.forEach(function(p){
-    if(!shown[p.cat])return;
-    var c=xy(p),b=document.createElement('button');
-    b.className='pin'+(p.id===sel?' sel':'');b.dataset.id=p.id;b.type='button';
-    b.style.cssText='left:'+c[0]+'%;top:'+c[1]+'%;'+CATS[p.cat].c;
-    b.textContent=letter(p.cat);b.setAttribute('aria-label',p.name+', '+CATS[p.cat].name);
-    b.onclick=function(){showDetail(p)};frame.appendChild(b);
+    var m=markers[p.id];
+    if(!shown[p.cat]){if(m&&map&&map.hasLayer(m))map.removeLayer(m);return}
+    if(map){if(!m)m=makeMarker(p);if(!map.hasLayer(m))m.addTo(map);var el=m.getElement();if(el)el.setAttribute('aria-label',p.name+', '+CATS[p.cat].name)}
     var li=document.createElement('li'),lb=document.createElement('button');
-    lb.type='button';lb.innerHTML=dot(p.cat)+p.name;lb.onclick=function(){showDetail(p);frame.scrollIntoView({block:'center'})};
+    lb.type='button';lb.innerHTML=dot(p.cat)+p.name;
+    lb.onclick=function(){showDetail(p,true);frame.scrollIntoView({block:'center',behavior:calm?'auto':'smooth'})};
     li.appendChild(lb);list.appendChild(li);
   });
-  if(sel!==null&&!shown[P[sel].cat])showDetail(null);
+  if(sel!==null&&!shown[P[sel].cat])showDetail(null);else mark();
+}
+function initMap(){
+  if(map){map.invalidateSize();return}
+  if(!window.L){frame.innerHTML='<p style="padding:20px">The map could not load. Use the list below, or open the campus in Google Maps.</p>';return}
+  map=L.map(frame,{scrollWheelZoom:false,zoomSnap:0.5});
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+  map.fitBounds(L.latLngBounds(P.map(function(p){return[p.lat,p.lon]})),{padding:[30,30]});
+  map.on('focus',function(){map.scrollWheelZoom.enable()});map.on('blur',function(){map.scrollWheelZoom.disable()});
+  if(EDIT){document.getElementById('editbox').style.display='block';editOut()}
+  draw();
 }
 var filters=document.getElementById('filters');
 Object.keys(CATS).forEach(function(k){
@@ -519,6 +530,16 @@ Object.keys(CATS).forEach(function(k){
   filters.appendChild(b);
 });
 showDetail(null);draw();
+
+// Photos: try common file extensions so .JPG, .jpeg or .png names still work. The slot hides if no file exists.
+(function(){
+  var exts=['jpg','jpeg','png','webp','JPG','JPEG','PNG'];
+  document.querySelectorAll('img[data-img]').forEach(function(img){
+    var base=img.getAttribute('data-img'),i=0;
+    function next(){if(i>=exts.length){img.remove();return}img.src='images/'+base+'.'+exts[i++]}
+    img.onerror=next;next();
+  });
+})();
 if(MY_MAPS_EMBED){var f=document.createElement('iframe');f.src=MY_MAPS_EMBED;f.title='Strath Unfiltered campus map on Google Maps';f.loading='lazy';f.className='gmap';
   document.getElementById('gmapslot').appendChild(f);document.getElementById('gmapslot').hidden=false}
 
@@ -546,7 +567,8 @@ function route(){
   document.querySelectorAll('nav.main a').forEach(function(a){
     if(a.getAttribute('href')==='#'+h)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   closeMenus();ddBtn.classList.toggle('cur',!!dd.querySelector('[aria-current]'));
-  if(h==='map'&&pending!==null){var p=P[pending];shown[p.cat]=true;draw();showDetail(p);pending=null}
+  if(h==='map')initMap();
+  if(h==='map'&&pending!==null){var p=P[pending];shown[p.cat]=true;draw();showDetail(p,true);pending=null}
   window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',route);route();
