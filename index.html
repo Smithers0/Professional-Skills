@@ -159,6 +159,12 @@ form.fb select,form.fb textarea{border-radius:10px}
 .btn.ghost{background:transparent;color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
 .btn.ghost:hover{background:var(--band);color:var(--navy)}
 .gmap{width:100%;height:480px;border:0;border-radius:16px;display:block}
+.ph{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--band);margin-bottom:6px}
+.hero{position:relative;overflow:hidden}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero:has(.hero-img){padding:5.5rem 0}
+.hero:has(.hero-img)::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(20,33,61,.5),rgba(20,33,61,.72))}
+.hero .wrap{position:relative;z-index:2}
 /* Gentler equivalents, not no feedback */
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -198,7 +204,7 @@ form.fb select,form.fb textarea{border-radius:10px}
 <main>
 <!-- HOME -->
 <div class="page" id="p-home">
-  <div class="banner"><div class="wrap"><h1>Strath Unfiltered</h1><p>Honest advice for new Strathclyde students, from the students already here.</p></div></div>
+  <div class="banner hero"><img class="hero-img" src="images/home-banner.jpg" alt="" onerror="this.remove()"><div class="wrap"><h1>Strath Unfiltered</h1><p>Honest advice for new Strathclyde students, from the students already here.</p></div></div>
   <section class="band"><div class="wrap stack">
     <h2>Start here</h2>
     <div class="tiles">
@@ -246,11 +252,11 @@ form.fb select,form.fb textarea{border-radius:10px}
     <h2>Best places to study</h2>
     <p>Picked from what current students suggested.</p>
     <div class="cards">
-      <div class="card"><h3>Library</h3><p>All floors except floor 2.</p></div>
-      <div class="card"><h3>Livingstone Tower</h3><p>Often free rooms, on all floors.</p></div>
-      <div class="card"><h3>Stenhouse Wing</h3><p>Floor 4 has a large computer room.</p></div>
-      <div class="card"><h3>James Weir</h3><p>The computer rooms on floor 4 are often free.</p></div>
-      <div class="card"><h3>Learning and Teaching</h3><p>A good place to meet groups and talk.</p></div>
+      <div class="card"><img class="ph" src="images/library.jpg" alt="The university library" loading="lazy" onerror="this.remove()"><h3>Library</h3><p>All floors except floor 2.</p></div>
+      <div class="card"><img class="ph" src="images/livingstone-tower.jpg" alt="Livingstone Tower" loading="lazy" onerror="this.remove()"><h3>Livingstone Tower</h3><p>Often free rooms, on all floors.</p></div>
+      <div class="card"><img class="ph" src="images/stenhouse-wing.jpg" alt="Stenhouse Wing of the Business School" loading="lazy" onerror="this.remove()"><h3>Stenhouse Wing</h3><p>Floor 4 has a large computer room.</p></div>
+      <div class="card"><img class="ph" src="images/james-weir.jpg" alt="James Weir Building" loading="lazy" onerror="this.remove()"><h3>James Weir</h3><p>The computer rooms on floor 4 are often free.</p></div>
+      <div class="card"><img class="ph" src="images/learning-and-teaching.jpg" alt="Learning and Teaching Building" loading="lazy" onerror="this.remove()"><h3>Learning and Teaching</h3><p>A good place to meet groups and talk.</p></div>
     </div>
   </div></section>
 </div>
@@ -295,15 +301,12 @@ form.fb select,form.fb textarea{border-radius:10px}
   <div class="banner"><div class="wrap"><h1>Food and nights out</h1><p>Where students actually eat, get coffee and go for a drink near campus.</p></div></div>
   <section class="band"><div class="wrap stack">
     <h2>Survey favourites</h2>
-    <div class="tablebox"><table>
-      <thead><tr><th>Place</th><th>Good for</th><th>Price level</th><th>What students said</th></tr></thead>
-      <tbody>
-        <tr><td>Roasters</td><td>Coffee</td><td><span class="todo">[Ethan]</span></td><td>Most mentioned for coffee</td></tr>
-        <tr><td>Greggs</td><td>Lunch</td><td><span class="todo">[Ethan]</span></td><td>The go-to cheap lunch</td></tr>
-        <tr><td>The Ark</td><td>Drinks</td><td><span class="todo">[Ethan]</span></td><td>Mentioned for drinks</td></tr>
-        <tr><td>The Howgait</td><td>Drinks</td><td><span class="todo">[Ethan]</span></td><td>Mentioned for drinks</td></tr>
-      </tbody>
-    </table></div>
+    <div class="cards">
+      <div class="card"><img class="ph" src="images/roasters.jpg" alt="Roasters coffee shop" loading="lazy" onerror="this.remove()"><h3>Roasters</h3><span class="src">Coffee · Price: <span class="todo">[Ethan]</span></span><p>Most mentioned for coffee.</p></div>
+      <div class="card"><img class="ph" src="images/greggs.jpg" alt="Greggs near campus" loading="lazy" onerror="this.remove()"><h3>Greggs</h3><span class="src">Lunch · Price: <span class="todo">[Ethan]</span></span><p>The go-to cheap lunch.</p></div>
+      <div class="card"><img class="ph" src="images/the-ark.jpg" alt="The Ark bar" loading="lazy" onerror="this.remove()"><h3>The Ark</h3><span class="src">Drinks · Price: <span class="todo">[Ethan]</span></span><p>Mentioned for drinks.</p></div>
+      <div class="card"><img class="ph" src="images/the-howgait.jpg" alt="The Howgait bar" loading="lazy" onerror="this.remove()"><h3>The Howgait</h3><span class="src">Drinks · Price: <span class="todo">[Ethan]</span></span><p>Mentioned for drinks.</p></div>
+    </div>
     <p class="src">Source: student survey. Addresses and map pins still to add.</p>
   </div></section>
 </div>
@@ -314,9 +317,9 @@ form.fb select,form.fb textarea{border-radius:10px}
   <section class="band"><div class="wrap stack">
     <h2>Halls students mentioned</h2>
     <div class="cards">
-      <div class="card"><h3>Birkbeck Court</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
-      <div class="card"><h3>James Young</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
-      <div class="card"><h3>Chancellors Hall</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><img class="ph" src="images/birkbeck-court.jpg" alt="Birkbeck Court halls" loading="lazy" onerror="this.remove()"><h3>Birkbeck Court</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><img class="ph" src="images/james-young.jpg" alt="James Young halls" loading="lazy" onerror="this.remove()"><h3>James Young</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
+      <div class="card"><img class="ph" src="images/chancellors-hall.jpg" alt="Chancellors Hall halls" loading="lazy" onerror="this.remove()"><h3>Chancellors Hall</h3><p><span class="todo">[Chris: pros and cons]</span></p></div>
     </div>
   </div></section>
   <section class="band tint"><div class="wrap stack">
